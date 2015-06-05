@@ -2,10 +2,10 @@
 package org.visbol.displaygen;
 
 import com.beust.jcommander.JCommander;
-import org.sbolstandard.core.SBOLDocument;
-import org.sbolstandard.core.SBOLFactory;
+import org.sbolstandard.core2.SBOLDocument;
 
 import com.beust.jcommander.Parameter;
+import org.sbolstandard.core2.SBOLReader;
 import org.visbol.displaylist.DisplayList;
 
 import java.io.FileInputStream;
@@ -43,9 +43,10 @@ class DisplayGen
 
         try
         {
-            document = SBOLFactory.read(new FileInputStream(programArgs.input));
+
+            document = SBOLReader.readRDF(new FileInputStream(programArgs.input));
         }
-        catch(IOException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }

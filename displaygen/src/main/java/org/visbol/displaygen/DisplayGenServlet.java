@@ -1,8 +1,8 @@
 package org.visbol.displaygen;
 
 import com.google.gson.Gson;
-import org.sbolstandard.core.SBOLDocument;
-import org.sbolstandard.core.SBOLFactory;
+import org.sbolstandard.core2.SBOLDocument;
+import org.sbolstandard.core2.SBOLReader;
 import org.visbol.displaylist.DisplayList;
 
 import java.io.*;
@@ -40,9 +40,9 @@ public class DisplayGenServlet extends HttpServlet
 
         try
         {
-            document = SBOLFactory.read(new ByteArrayInputStream(field.getBytes(StandardCharsets.UTF_8)));
+            document = SBOLReader.readRDF(new ByteArrayInputStream(field.getBytes(StandardCharsets.UTF_8)));
         }
-        catch(IOException e)
+        catch(Exception e)
         {
             gson.toJson(e, writer);
 

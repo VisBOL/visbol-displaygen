@@ -1,14 +1,15 @@
 
 package org.visbol.displaygen;
 
-import org.sbolstandard.core.*;
-import org.sbolstandard.core.util.SBOLBaseVisitor;
+import org.sbolstandard.core2.*;
+import org.sbolstandard.core2.ComponentDefinition;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-public class DisplayListGenerator extends SBOLBaseVisitor<RuntimeException>
+public class DisplayListGenerator
 {
     private org.visbol.displaylist.DisplayList displayList = new org.visbol.displaylist.DisplayList();
 
@@ -18,83 +19,87 @@ public class DisplayListGenerator extends SBOLBaseVisitor<RuntimeException>
     {
         displayList.components.add(new org.visbol.displaylist.Component());
 
-        visit(document);
-    }
-
-    @Override
-    public void visit(SBOLDocument document)
-    {
-        for(SBOLRootObject object : document.getContents())
-        {
-            object.accept(this);
-        }
-    }
-
-    @Override
-    public void visit(Collection collection)
-    {
-        for(DnaComponent component : collection.getComponents())
-        {
-            visit(component);
-        }
-    }
-
-    @Override
-    public void visit(DnaComponent component)
-    {
         org.visbol.displaylist.Segment segment = new org.visbol.displaylist.Segment();
 
-        for(SequenceAnnotation annotation : component.getAnnotations())
+        for(ComponentDefinition componentDefinition : document.getComponentDefinitions())
         {
-            if(annotation.getSubComponent() == null)
-                continue;
-
-            DnaComponent subComponent = annotation.getSubComponent();
-
-            String glyphCode;
-            String glyphName = subComponent.getName();
-            String glyphID = subComponent.getDisplayId();
-
-            if(glyphName == null)
-                glyphName = glyphID;
-
-            String glyphStrand = annotation.getStrand() == StrandType.NEGATIVE
-                                     ? "negative" : "positive";
-
-            for(URI uri : subComponent.getTypes())
+            for(SequenceAnnotation annotation : componentDefinition.getSequenceAnnotations())
             {
-                String path = uri.getPath();
+                Component component = annotation.getComponent();
 
-                String[] pathSO = path.split("SO_");
+                String glyphCode;
 
-                if(pathSO.length == 2)
+                String glyphName = annotation.getName();
+
+                if(glyphName == null)
+                    glyphName = component.getName();
+
+                String glyphID = annotation.getDisplayId();
+
+                if(glyphID == null)
+                    glyphID = component.getDisplayId();
+
+                if(glyphName == null)
+                    glyphName = glyphID;
+
+                String glyphStrand = "positive";
+
+                Set<Location> locations = annotation.getLocations();
+
+                int start = Integer.MAX_VALUE;
+                int end = Integer.MIN_VALUE;
+
+                for(Location location : locations)
                 {
-                    String soNum = pathSO[1];
+                    if(location.getOrientation() == OrientationType.REVERSECOMPLEMENT)
+                        glyphStrand = "negative";
 
-                    glyphCode = org.visbol.displaylist.GlyphMap.getGlyphCode("SO:" + soNum);
-
-                    if(glyphCode == null)
+                    if(location instanceof Range)
                     {
-                        System.out.println("Unknown SO: " + soNum);
-                        continue;
+                        start = Math.min(start, ((Range) location).getStart());
+                        end = Math.max(end, ((Range) location).getEnd());
                     }
-
-                    int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
-
-                    glyphTypeIDs.put(glyphCode, idNumber);
-
-                    org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
-                                            glyphName,
-                                            glyphCode + "-" + idNumber,
-                                            glyphStrand,
-                                            annotation.getBioStart(),
-                                            annotation.getBioEnd());
-
-                    segment.sequence.add(glyph);
                 }
-                else
+
+                ComponentDefinition annotationComponentDefinition = component.getDefinition();
+
+                if(annotationComponentDefinition == null)
+                    continue;
+
+                for(URI uri : annotationComponentDefinition.getRoles())
                 {
-                    System.out.println("Couldn't find SO number in URI: " + path);
+                    String path = uri.getPath();
+
+                    String[] pathSO = path.split("SO_");
+
+                    if(pathSO.length == 2)
+                    {
+                        String soNum = pathSO[1];
+
+                        glyphCode = org.visbol.displaylist.GlyphMap.getGlyphCode("SO:" + soNum);
+
+                        if(glyphCode == null)
+                        {
+                            System.out.println("Unknown SO: " + soNum);
+                            continue;
+                        }
+
+                        int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
+
+                        glyphTypeIDs.put(glyphCode, idNumber);
+
+                        org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
+                                glyphName,
+                                glyphCode + "-" + idNumber,
+                                glyphStrand,
+                                start,
+                                end);
+
+                        segment.sequence.add(glyph);
+                    } else
+                    {
+                        System.out.println("Couldn't find SO number in URI: " + path);
+                    }
                 }
             }
         }
