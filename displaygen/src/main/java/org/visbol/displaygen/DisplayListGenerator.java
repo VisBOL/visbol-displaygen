@@ -38,8 +38,11 @@ public class DisplayListGenerator
 
                 String glyphID = annotation.getDisplayId();
 
-                if(glyphID == null)
+                if(glyphID == null || glyphID.length() == 0)
                     glyphID = component.getDisplayId();
+
+                if(glyphName == null)
+                    glyphName = component.getDefinition().getName();
 
                 if(glyphName == null)
                     glyphName = glyphID;
