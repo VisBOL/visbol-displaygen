@@ -87,23 +87,23 @@ public class DisplayListGenerator
 
                         glyphCode = org.visbol.displaylist.GlyphMap.getGlyphCode("SO:" + soNum);
                     }
-
-                    if(glyphCode == null)
-                        glyphCode = "user-defined";
-
-                    int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
-
-                    glyphTypeIDs.put(glyphCode, idNumber);
-
-                    org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
-                            glyphName,
-                            glyphCode + "-" + idNumber,
-                            glyphStrand,
-                            start,
-                            end);
-
-                    segment.sequence.add(glyph);
                 }
+
+                if(glyphCode == null)
+                    glyphCode = "user-defined";
+
+                int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
+
+                glyphTypeIDs.put(glyphCode, idNumber);
+
+                org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
+                        glyphName,
+                        glyphCode + "-" + idNumber,
+                        glyphStrand,
+                        start,
+                        end);
+
+                segment.sequence.add(glyph);
             }
         }
 
