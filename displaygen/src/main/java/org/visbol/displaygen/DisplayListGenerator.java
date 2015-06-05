@@ -21,10 +21,10 @@ public class DisplayListGenerator
     {
         displayList.components.add(new org.visbol.displaylist.Component());
 
-        org.visbol.displaylist.Segment segment = new org.visbol.displaylist.Segment();
-
         for(ComponentDefinition componentDefinition : document.getComponentDefinitions())
         {
+            org.visbol.displaylist.Segment segment = new org.visbol.displaylist.Segment();
+
             for(SequenceAnnotation annotation : componentDefinition.getSequenceAnnotations())
             {
                 Component component = annotation.getComponent();
@@ -110,17 +110,20 @@ public class DisplayListGenerator
 
                 segment.sequence.add(glyph);
             }
-        }
 
-        segment.sequence.sort(new Comparator<Glyph>()
-        {
-            public int compare(Glyph glyphA, Glyph glyphB)
+            if(segment.sequence.size() > 0)
             {
-                return glyphA.start - glyphB.start;
-            }
-        });
+                segment.sequence.sort(new Comparator<Glyph>()
+                {
+                    public int compare(Glyph glyphA, Glyph glyphB)
+                    {
+                        return glyphA.start - glyphB.start;
+                    }
+                });
 
-        displayList.components.get(0).segments.add(segment);
+                displayList.components.get(0).segments.add(segment);
+            }
+        }
     }
 
     public org.visbol.displaylist.DisplayList getDisplayList()
