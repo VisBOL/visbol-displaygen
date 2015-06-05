@@ -27,7 +27,7 @@ public class DisplayListGenerator
             {
                 Component component = annotation.getComponent();
 
-                String glyphCode;
+                String glyphCode = null;
 
                 String glyphName = annotation.getName();
 
@@ -70,36 +70,39 @@ public class DisplayListGenerator
                 {
                     String path = uri.getPath();
 
+                    /* Look for SO of the form SO_*
+                     */
                     String[] pathSO = path.split("SO_");
 
+                    /* If not found, look for SO of the form SO:*
+                     */
+                    if(pathSO.length != 2)
+                        pathSO = path.split("SO:");
+
+                    /* If found, map to a glyph
+                     */
                     if(pathSO.length == 2)
                     {
                         String soNum = pathSO[1];
 
                         glyphCode = org.visbol.displaylist.GlyphMap.getGlyphCode("SO:" + soNum);
-
-                        if(glyphCode == null)
-                        {
-                            System.out.println("Unknown SO: " + soNum);
-                            continue;
-                        }
-
-                        int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
-
-                        glyphTypeIDs.put(glyphCode, idNumber);
-
-                        org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
-                                glyphName,
-                                glyphCode + "-" + idNumber,
-                                glyphStrand,
-                                start,
-                                end);
-
-                        segment.sequence.add(glyph);
-                    } else
-                    {
-                        System.out.println("Couldn't find SO number in URI: " + path);
                     }
+
+                    if(glyphCode == null)
+                        glyphCode = "user-defined";
+
+                    int idNumber = glyphTypeIDs.getOrDefault(glyphCode, 0) + 1;
+
+                    glyphTypeIDs.put(glyphCode, idNumber);
+
+                    org.visbol.displaylist.Glyph glyph = new org.visbol.displaylist.Glyph(glyphCode,
+                            glyphName,
+                            glyphCode + "-" + idNumber,
+                            glyphStrand,
+                            start,
+                            end);
+
+                    segment.sequence.add(glyph);
                 }
             }
         }
