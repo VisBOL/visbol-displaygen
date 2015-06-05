@@ -44,7 +44,7 @@ class DisplayGen
         try
         {
 
-            document = SBOLReader.readRDF(new FileInputStream(programArgs.input));
+            document = SBOLReader.read(new FileInputStream(programArgs.input));
         }
         catch(Exception e)
         {

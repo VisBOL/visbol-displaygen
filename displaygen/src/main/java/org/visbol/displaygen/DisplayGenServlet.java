@@ -40,7 +40,7 @@ public class DisplayGenServlet extends HttpServlet
 
         try
         {
-            document = SBOLReader.readRDF(new ByteArrayInputStream(field.getBytes(StandardCharsets.UTF_8)));
+            document = SBOLReader.read(new ByteArrayInputStream(field.getBytes(StandardCharsets.UTF_8)));
         }
         catch(Exception e)
         {
