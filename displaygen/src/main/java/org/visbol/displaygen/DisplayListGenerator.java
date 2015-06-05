@@ -3,8 +3,10 @@ package org.visbol.displaygen;
 
 import org.sbolstandard.core2.*;
 import org.sbolstandard.core2.ComponentDefinition;
+import org.visbol.displaylist.Glyph;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +108,14 @@ public class DisplayListGenerator
                 segment.sequence.add(glyph);
             }
         }
+
+        segment.sequence.sort(new Comparator<Glyph>()
+        {
+            public int compare(Glyph glyphA, Glyph glyphB)
+            {
+                return glyphA.start - glyphB.start;
+            }
+        });
 
         displayList.components.get(0).segments.add(segment);
     }
