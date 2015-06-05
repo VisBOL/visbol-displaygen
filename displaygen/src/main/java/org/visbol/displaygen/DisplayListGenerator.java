@@ -25,6 +25,11 @@ public class DisplayListGenerator
         {
             org.visbol.displaylist.Segment segment = new org.visbol.displaylist.Segment();
 
+            segment.name = componentDefinition.getName();
+
+            if(segment.name == null)
+                segment.name = componentDefinition.getDisplayId();
+
             for(SequenceAnnotation annotation : componentDefinition.getSequenceAnnotations())
             {
                 Component component = annotation.getComponent();
