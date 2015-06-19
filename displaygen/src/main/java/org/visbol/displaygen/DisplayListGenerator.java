@@ -1,11 +1,19 @@
 
 package org.visbol.displaygen;
 
+import com.google.gson.Gson;
 import org.sbolstandard.core2.*;
 import org.sbolstandard.core2.ComponentDefinition;
 import org.visbol.displaylist.Glyph;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
+import java.nio.Buffer;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +103,30 @@ public class DisplayListGenerator
                     {
                         String soNum = pathSO[1];
 
-                        glyphCode = org.visbol.displaylist.GlyphMap.getGlyphCode("SO:" + soNum);
+                        try
+                        {
+                            HttpURLConnection connection = (HttpURLConnection)
+                                    new URL("http://dasbol.org/so/SO:" + soNum).openConnection();
+
+                            BufferedReader reader = new BufferedReader(
+                                    new InputStreamReader(connection.getInputStream()));
+
+                            StringBuilder builder = new StringBuilder();
+
+                            String line;
+
+                            while ((line = reader.readLine()) != null)
+                                builder.append(line + "\n");
+
+                            SOMapping mapping = new Gson().fromJson(builder.toString(), SOMapping.class);
+
+                            glyphCode = mapping.glyph;
+                        }
+                        catch(Exception e)
+                        {
+                            /* glyphCode will be null */
+                        }
+
                     }
                 }
 

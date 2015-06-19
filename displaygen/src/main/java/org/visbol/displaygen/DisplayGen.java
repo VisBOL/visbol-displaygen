@@ -27,7 +27,7 @@ class DisplayGen
 
     public static void main(String[] args)
     {
-        Args programArgs = new Args();
+/*        Args programArgs = new Args();
 
         JCommander jCommander = new JCommander(programArgs, args);
 
@@ -37,14 +37,14 @@ class DisplayGen
         {
             jCommander.usage();
             return;
-        }
+        }*/
 
         SBOLDocument document = null;
 
         try
         {
 
-            document = SBOLReader.read(new FileInputStream(programArgs.input));
+            document = SBOLReader.read(new FileInputStream("/Users/james/sbol2.xml"));
         }
         catch(Exception e)
         {
@@ -59,7 +59,9 @@ class DisplayGen
 
         String json = gson.toJson(displayList);
 
-        FileWriter writer;
+
+        System.out.print(json);
+      /*  FileWriter writer;
 
         try
         {
@@ -70,6 +72,6 @@ class DisplayGen
         catch(IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
     }
 }
